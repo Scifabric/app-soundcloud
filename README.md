@@ -1,7 +1,7 @@
 PyBossa demo application SoundCloud
 ===================================
 
-This application shows how you can do sound pattern recognition using
+This application shows how you can do sound pattern recognition using the
 [SoundCloud API](http://developers.soundcloud.com/). 
 
 ![alt screenshot](http://i.imgur.com/ZkNSfnE.png)
