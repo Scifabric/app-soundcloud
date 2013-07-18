@@ -19,11 +19,31 @@
 import json
 from optparse import OptionParser
 import pbclient
+import logging
 from get_sounds import get_soundcloud_clips
+from requests import exceptions
 
 
 def contents(filename):
     return file(filename).read()
+
+
+def check_api_error(api_response):
+    """Check if returned API response contains an error"""
+    if type(api_response) == dict and (api_response.get('status') == 'failed'):
+        raise exceptions.HTTPError
+
+
+def format_error(module, error):
+    """Format the error for the given module"""
+    logging.error(module)
+    # Beautify JSON error
+    if type(error) == list:
+        print "Application not found"
+    else:
+        print json.dumps(error, sort_keys=True, indent=4, separators=(',', ': '))
+    exit(1)
+
 
 if __name__ == "__main__":
     # Arguments for the application
@@ -98,7 +118,12 @@ if __name__ == "__main__":
         print('Using API-KEY: %s' % options.api_key)
 
     def find_app_by_short_name():
-        return pbclient.find_app(short_name=app_config['short_name'])[0]
+        try:
+            response = pbclient.find_app(short_name=app_config['short_name'])
+            check_api_error(response)
+            return response[0]
+        except:
+            format_error("pbclient.find_app", response)
 
     def setup_app():
         app = find_app_by_short_name()
@@ -107,20 +132,32 @@ if __name__ == "__main__":
         app.info['thumbnail'] = app_config['thumbnail']
         app.info['tutorial'] = contents('tutorial.html')
 
-        pbclient.update_app(app)
-        return app
+        try:
+            response = pbclient.update_app(app)
+            check_api_error(response)
+            return app
+        except:
+            format_error("pbclient.update_app", response)
 
     def create_sound_task(app, sound, question):
         # Data for the tasks
         task_info = dict(question=question,
                          n_answers=options.n_answers,
                          embed=sound)
-        pbclient.create_task(app.id, task_info)
+        try:
+            response = pbclient.create_task(app.id, task_info)
+            check_api_error(response)
+        except:
+            format_error("pbclient.create_task", response)
 
     if options.create_app:
-        pbclient.create_app(app_config['name'],
-                            app_config['short_name'],
-                            app_config['description'])
+        try:
+            response = pbclient.create_app(app_config['name'],
+                                           app_config['short_name'],
+                                           app_config['description'])
+            check_api_error(response)
+        except:
+            format_error("pbclient.create_app", response)
 
         app = setup_app()
 
@@ -137,7 +174,7 @@ if __name__ == "__main__":
         if options.add_more_tasks:
 
             app = find_app_by_short_name()
-            photos = get_soundcloud_clips()
+            sounds = get_soundcloud_clips()
             question = "Is it a Hip-Hop song?"
             [create_sound_task(app, s, question) for s in sounds]
 
@@ -159,10 +196,19 @@ if __name__ == "__main__":
                 if ('n_answers' in task.info.keys()):
                     del(task.info['n_answers'])
                 task.n_answers = int(options.update_tasks)
-                pbclient.update_task(task)
-                n_tasks += 1
+                try:
+                    response = pbclient.update_task(task)
+                    check_api_error(response)
+                    n_tasks += 1
+                except:
+                    format_error("pbclient.update_task", response)
+
             offset = (offset + limit)
-            tasks = pbclient.get_tasks(app.id, offset=offset, limit=limit)
+            try:
+                tasks = pbclient.get_tasks(app.id, offset=offset, limit=limit)
+                check_api_error(tasks)
+            except:
+                format_error("pbclient.get_tasks", tasks)
         print "%s Tasks have been updated!" % n_tasks
 
     if not options.create_app and not options.update_template\
