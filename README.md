@@ -18,10 +18,12 @@ Testing the application
 You need to install the pybossa-client and the soundcloud client (use a virtualenv):
 
 ```bash
-    $ pip install pybossa-client
-    $ pip install soundcloud
+    $ pip install -r requirements.txt
 ```
-Then, you can follow the next steps:
+You need a SoundCloud Client ID, so if you don't have one, you will need to
+create it. Go to [http://developers.soundcloud.com](http://developers.soundcloud.org) and follow the instructions.
+Once you have the Client ID, copy the file **config.py.tmpl** to **config.py**
+and fill in the contents with your Client ID token. Then, you can follow the next steps:
 
 *  Create an account in PyBossa
 *  Copy under your account profile your API-KEY
