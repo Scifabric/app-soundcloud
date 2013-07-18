@@ -17,13 +17,14 @@
 
 
 import soundcloud
+import config
 
 
 def get_soundcloud_clips():
     """
     Gets public soundcloud clips
     """
-    client = soundcloud.Client(client_id="APP-KEY")
+    client = soundcloud.Client(client_id=config.client_id)
     #tracks = client.get('/tracks', tags='hip-hop, pop, rock', license='cc-by-sa')
     tracks = client.get('/tracks', tags='hip-hop, pop, rock')
     html = []
@@ -33,7 +34,7 @@ def get_soundcloud_clips():
             print t.permalink_url
             e = client.get('/oembed', url=t.permalink_url)
             html.append(e.html)
-            n = n + 1;
+            n = n + 1
         else:
             break
     return html
