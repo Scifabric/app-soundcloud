@@ -129,7 +129,6 @@ if __name__ == "__main__":
         app = find_app_by_short_name()
         app.long_description = contents('long_description.html')
         app.info['task_presenter'] = contents('template.html')
-        app.info['thumbnail'] = app_config['thumbnail']
         app.info['tutorial'] = contents('tutorial.html')
 
         try:
