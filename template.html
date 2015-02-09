@@ -118,7 +118,7 @@ pybossa.taskLoaded(function(task, deferred) {
 
         if ((task.info.embed === undefined) && (task.info.audio_url)) {
             var embed = $("<audio>");
-            embed.attr("src", task.info.audio);
+            embed.attr("src", task.info.audio_url);
             embed.attr("width", '100%');
             embed.prop('controls', true);
             task.info.embed = embed;
