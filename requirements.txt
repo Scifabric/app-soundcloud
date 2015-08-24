@@ -1,2 +1,2 @@
-pybossa-client
+pybossa-pbs
 soundcloud
