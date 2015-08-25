@@ -22,8 +22,6 @@ The project has five main files:
 Testing the project
 ===================
 
-# Testing the project
-
 You need to install the pybossa-pbs and the SoundCloud client libraries. Use of
 a virtual environment is recommended:
 
