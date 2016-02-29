@@ -17,7 +17,7 @@
             <br/>
             <div class="alert-actions">
                 <a class="btn small" href="/">Go back</a>
-                <a class="btn small" href="/app">or, Check other applications</a>
+                <a class="btn small" href="/project">or, Check other projects</a>
             </div>
         </div>
         <div id="error" class="alert alert-error" style="display:none;">
@@ -52,7 +52,7 @@
             <div id="progress" rel="tooltip" title="#" class="bar" style="width: 0%;"></div>
         </div>
         <!-- 
-            This application uses Disqus to allow users to provide some feedback.
+            This project uses Disqus to allow users to provide some feedback.
             The next section includes a button that when a user clicks on it will
             load the comments, if any, for the given task
         -->
@@ -90,7 +90,9 @@
 </script>
 <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
 
-<script>
+<script type="text/javascript" src="/static/js/pybossa-player/dist/pybossa-player.min.js"></script>
+<script type="text/javascript">
+(function() {
 function loadUserProgress() {
     pybossa.userProgress('soundcloud').done(function(data){
         var pct = Math.round((data.done*100)/data.total);
@@ -105,23 +107,8 @@ function loadUserProgress() {
 pybossa.taskLoaded(function(task, deferred) {
     if ( !$.isEmptyObject(task) ) {
         // keep this  if block for backwards compatibility...
-        // load image from soundcloud
         if (task.info.song) {
-            var embed = $('<iframe />');
-            embed.css('width', '100%');
-            embed.css('height', 166);
-            embed.attr('scrolling', 'no');
-            embed.attr('frameborder', 'no');
-            embed.attr('src', task.info.song);
-            task.info.embed = embed;
-        }
-
-        if ((task.info.embed === undefined) && (task.info.audio_url)) {
-            var embed = $("<audio>");
-            embed.attr("src", task.info.audio_url);
-            embed.attr("width", '100%');
-            embed.prop('controls', true);
-            task.info.embed = embed;
+            task.info.audio_url = task.info.song;
         }
         deferred.resolve(task);
     }
@@ -133,15 +120,15 @@ pybossa.taskLoaded(function(task, deferred) {
 pybossa.presentTask(function(task, deferred) {
     if ( !$.isEmptyObject(task) ) {
         loadUserProgress();
-        $('#sound-clip').html('').append(task.info.embed);
+        var player = PybossaPlayer(task.info.audio_url, 'sound-clip', true);
         $('#question').html(task.info.question);
         $('#task-id').html(task.id);
 
         $('.btn-answer').off('click').on('click', function(evt) {
             var answer = {'answer': $(this).attr("value")};
             if (typeof answer != 'undefined') {
-                //console.log(answer);
                 pybossa.saveTask(task.id, answer).done(function() {
+                    player.destroy();
                     deferred.resolve();
                 });
                 $("#loading").fadeIn(500);
@@ -164,4 +151,5 @@ pybossa.presentTask(function(task, deferred) {
 });
 
 pybossa.run('soundcloud');
+})();
 </script>
